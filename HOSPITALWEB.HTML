@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JOSEPH — Sign In & Book an Appointment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal-50: #E1F5EE;
+      --teal-100: #9FE1CB;
+      --teal-600: #0F6E56;
+      --teal-800: #085041;
+      --blue-50: #E6F1FB;
+      --blue-600: #185FA5;
+      --gray-50: #F1EFE8;
+      --gray-100: #D3D1C7;
+      --gray-400: #888780;
+      --gray-600: #5F5E5A;
+      --gray-900: #2C2C2A;
+      --red-600: #A32D2D;
+      --surface: #ffffff;
+      --page-bg: #F7F9FC;
+      --radius: 8px;
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--page-bg);
+      color: var(--gray-900);
+    }
+
+    /* =========================================================
+       LOGIN VIEW
+    ========================================================= */
+    .login-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+    }
+
+    .brand-panel {
+      position: relative;
+      background: var(--teal-800);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 3rem;
+      color: white;
+      min-height: 100%;
+    }
+    .brand-panel img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.55;
+    }
+    .brand-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(8,80,65,0.15) 0%, rgba(8,80,65,0.35) 55%, rgba(8,80,65,0.92) 100%);
+    }
+    .brand-content { position: relative; z-index: 2; }
+    .brand-mark { display: flex; align-items: center; gap: 12px; margin-bottom: 2.25rem; }
+    .brand-mark span.name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .brand-mark span.tag {
+      font-size: 0.68rem;
+      color: var(--teal-100);
+      display: block;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .brand-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 500;
+      line-height: 1.25;
+      max-width: 20ch;
+      margin-bottom: 0.85rem;
+    }
+
+    .subtitle-rotator { position: relative; min-height: 2.6em; max-width: 36ch; margin-bottom: 0.5rem; }
+    .subtitle-rotator p {
+      position: absolute;
+      inset: 0;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--teal-100);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .subtitle-rotator p.active { opacity: 1; transform: translateY(0); }
+    .subtitle-dots { display: flex; gap: 6px; margin-top: 0.9rem; }
+    .subtitle-dots button {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.35);
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .subtitle-dots button.active { background: white; transform: scale(1.25); }
+
+    .brand-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.18);
+    }
+    .brand-stats .stat { cursor: default; transition: transform 0.2s; }
+    .brand-stats .stat:hover { transform: translateY(-3px); }
+    .brand-stats .stat b { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 500; display: block; }
+    .brand-stats .stat span { font-size: 0.7rem; color: var(--teal-100); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .form-panel { display: flex; align-items: center; justify-content: center; padding: 2.5rem; background: var(--surface); }
+    .form-wrap { width: 100%; max-width: 380px; }
+    .form-wrap .eyebrow {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--teal-600); margin-bottom: 0.6rem;
+    }
+    .form-wrap h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem; font-weight: 500; color: var(--teal-800); margin-bottom: 0.4rem;
+    }
+    .form-wrap > p.sub { font-size: 0.87rem; color: var(--gray-600); line-height: 1.55; margin-bottom: 2rem; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 1.15rem; }
+    label { font-size: 0.8rem; font-weight: 500; color: var(--gray-600); }
+    label .req { color: var(--teal-600); margin-left: 2px; }
+
+    .input-wrap { position: relative; }
+    .input-wrap svg { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--gray-400); pointer-events: none; }
+
+    input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="time"],
+    input[type="password"], select, textarea {
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--gray-900);
+      background: #FAFBFD;
+      border: 0.5px solid #CDD3DE;
+      border-radius: var(--radius);
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+    }
+    .form-panel input[type="text"], .form-panel input[type="password"] { padding-left: 2.5rem; }
+    input::placeholder, textarea::placeholder { color: var(--gray-400); }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--teal-600);
+      box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.1);
+      background: white;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888780' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      padding-right: 2.2rem;
+      cursor: pointer;
+    }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+    .toggle-pass {
+      position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--gray-400);
+      display: flex; align-items: center; padding: 4px;
+    }
+    .toggle-pass:hover { color: var(--teal-600); }
+
+    .row-between { display: flex; align-items: center; justify-content: space-between; margin: -0.35rem 0 1.4rem; font-size: 0.8rem; }
+    .remember { display: flex; align-items: center; gap: 7px; color: var(--gray-600); cursor: pointer; user-select: none; }
+    .remember input { width: 15px; height: 15px; accent-color: var(--teal-600); cursor: pointer; }
+    .row-between a { color: var(--teal-600); text-decoration: none; font-weight: 500; }
+    .row-between a:hover { text-decoration: underline; }
+
+    .btn-signin {
+      width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
+      color: white; background: var(--teal-600); border: none; border-radius: var(--radius);
+      padding: 0.75rem; cursor: pointer; transition: background 0.15s, transform 0.1s;
+    }
+    .btn-signin:hover { background: var(--teal-800); }
+    .btn-signin:active { transform: scale(0.99); }
+
+    .error-msg {
+      display: none; align-items: center; gap: 8px; background: #FEE2E2;
+      border-left: 3px solid var(--red-600); color: var(--red-600); font-size: 0.8rem;
+      padding: 0.6rem 0.85rem; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 1.1rem;
+    }
+
+    .divider {
+      display: flex; align-items: center; gap: 10px; color: var(--gray-400);
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; margin: 1.6rem 0;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
+
+    .staff-note { font-size: 0.78rem; color: var(--gray-400); text-align: center; line-height: 1.6; }
+    .staff-note strong { color: var(--gray-600); }
+
+    @media (max-width: 860px) {
+      .login-shell { grid-template-columns: 1fr; }
+      .brand-panel { min-height: 240px; padding: 2rem 1.5rem; }
+      .brand-content h2 { font-size: 1.5rem; }
+      .brand-stats { display: none; }
+      .form-panel { padding: 2rem 1.25rem 3rem; }
+    }
+
+    /* =========================================================
+       APPOINTMENT VIEW
+    ========================================================= */
+    .site-header {
+      background: var(--teal-600);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .site-header .brand-block { display: flex; align-items: center; gap: 12px; }
+    .site-header svg { flex-shrink: 0; }
+    .site-header h1 { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 500; color: #ffffff; letter-spacing: 0.01em; }
+    .site-header span.tagline {
+      font-size: 0.75rem; color: var(--teal-100); display: block;
+      font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .btn-logout {
+      font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 500;
+      color: white; background: rgba(255,255,255,0.15); border: 0.5px solid rgba(255,255,255,0.4);
+      border-radius: var(--radius); padding: 0.5rem 1rem; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,0.28); }
+
+    .page-wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+
+    .welcome-strip {
+      background: var(--teal-50);
+      border: 0.5px solid var(--teal-100);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--teal-800);
+      margin-bottom: 1.5rem;
+    }
+    .welcome-strip strong { font-weight: 600; }
+
+    .page-intro { margin-bottom: 2rem; }
+    .page-intro h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 500; color: var(--teal-800); margin-bottom: 0.35rem; }
+    .page-intro p { font-size: 0.9rem; color: var(--gray-600); line-height: 1.6; }
+
+    .steps { display: flex; align-items: center; gap: 0; margin-bottom: 2rem; }
+    .step { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 500; color: var(--gray-400); }
+    .step.active { color: var(--teal-600); }
+    .step-num {
+      width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--gray-100);
+      display: flex; align-items: center; justify-content: center; font-size: 0.72rem;
+      background: white; color: var(--gray-400); flex-shrink: 0;
+    }
+    .step.active .step-num { background: var(--teal-600); border-color: var(--teal-600); color: white; }
+    .step-line { flex: 1; height: 1px; background: var(--gray-100); margin: 0 8px; }
+
+    .card { background: var(--surface); border: 0.5px solid #DDE3EC; border-radius: 12px; padding: 2rem 2.25rem; margin-bottom: 1.25rem; }
+    .card-title {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--teal-600); margin-bottom: 1.35rem; display: flex; align-items: center; gap: 8px;
+    }
+    .card-title::after { content: ''; flex: 1; height: 1px; background: var(--teal-50); }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.25rem; }
+    .form-grid .full { grid-column: 1 / -1; }
+
+    .radio-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .radio-pill {
+      display: flex; align-items: center; gap: 7px; padding: 0.45rem 0.9rem;
+      border: 0.5px solid #CDD3DE; border-radius: 999px; font-size: 0.85rem; color: var(--gray-600);
+      cursor: pointer; transition: all 0.15s; background: #FAFBFD; user-select: none;
+    }
+    .radio-pill input { display: none; }
+    .radio-pill:hover { border-color: var(--teal-600); color: var(--teal-600); }
+    .radio-pill.checked { background: var(--teal-50); border-color: var(--teal-600); color: var(--teal-800); font-weight: 500; }
+    .radio-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid currentColor; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .radio-pill.checked .radio-dot::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--teal-600); }
+
+    .info-box {
+      background: var(--blue-50); border-left: 3px solid var(--blue-600); border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--blue-600); line-height: 1.55; margin-top: 0.5rem;
+    }
+
+    .form-actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.5rem 0 0; }
+    .btn-back {
+      font-family: 'Inter', sans-serif; font-size: 0.875rem; font-weight: 500; color: var(--gray-600);
+      background: none; border: 0.5px solid #CDD3DE; border-radius: var(--radius); padding: 0.65rem 1.4rem;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-back:hover { border-color: var(--gray-400); color: var(--gray-900); }
+    .btn-submit {
+      font-family: 'Inter', sans-serif; font-size: 0.875rem; font-weight: 600; color: white;
+      background: var(--teal-600); border: none; border-radius: var(--radius); padding: 0.7rem 2rem;
+      cursor: pointer; transition: background 0.15s, transform 0.1s;
+    }
+    .btn-submit:hover { background: var(--teal-800); }
+    .btn-submit:active { transform: scale(0.98); }
+
+    .helper { font-size: 0.75rem; color: var(--gray-400); margin-top: 2px; }
+    .field-error {
+      display: none;
+      font-size: 0.75rem;
+      color: var(--red-600);
+      margin-top: 2px;
+    }
+    .field.has-error input {
+      border-color: var(--red-600) !important;
+      box-shadow: 0 0 0 3px rgba(163, 45, 45, 0.08) !important;
+    }
+    .field.has-error .field-error { display: block; }
+
+    .urgency-row { display: flex; gap: 0.75rem; }
+    .urgency-btn {
+      flex: 1; padding: 0.6rem; text-align: center; border: 0.5px solid #CDD3DE; border-radius: var(--radius);
+      font-size: 0.82rem; font-weight: 500; cursor: pointer; background: #FAFBFD; color: var(--gray-600); transition: all 0.15s;
+    }
+    .urgency-btn.selected-routine   { background: var(--teal-50);  border-color: var(--teal-600); color: var(--teal-800); }
+    .urgency-btn.selected-urgent    { background: #FEF3C7; border-color: #D97706; color: #92400E; }
+    .urgency-btn.selected-emergency { background: #FEE2E2; border-color: var(--red-600); color: var(--red-600); }
+
+    .consent-label { display: flex; gap: 10px; align-items: flex-start; font-size: 0.83rem; color: var(--gray-600); line-height: 1.6; cursor: pointer; }
+    .consent-label input[type="checkbox"] { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; accent-color: var(--teal-600); cursor: pointer; }
+    .consent-label a { color: var(--teal-600); text-decoration: none; }
+    .consent-label a:hover { text-decoration: underline; }
+
+    .footer-note { text-align: center; font-size: 0.78rem; color: var(--gray-400); margin-top: 1.5rem; line-height: 1.6; }
+    .footer-note strong { color: var(--gray-600); }
+
+    @media (max-width: 600px) {
+      .card { padding: 1.35rem 1.1rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full { grid-column: 1; }
+      .page-wrap { padding: 1.5rem 1rem 3rem; }
+      .steps { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================
+       VIEW 1 — LOGIN
+  ========================================================= -->
+  <div class="login-shell" id="loginView">
+
+    <div class="brand-panel">
+      <img src="joseph.jpeg" alt="JOSEPH building" />
+      <div class="brand-content">
+        <div class="brand-mark">
+          <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="6" fill="white" fill-opacity="0.15"/>
+            <path d="M16 6v20M6 16h20" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <span class="name">JOSEPH</span>
+            <span class="tag">Staff & Patient Portal</span>
+          </div>
+        </div>
+        <h2>Care coordination, all in one place.</h2>
+
+        <div class="subtitle-rotator" id="subtitleRotator">
+          <p class="active">Sign in to manage appointments, patient records and department schedules securely.</p>
+          <p>Real-time bed availability and doctor schedules — updated the moment they change.</p>
+          <p>One login. Every department. Zero paperwork chases.</p>
+        </div>
+        <div class="subtitle-dots" id="subtitleDots">
+          <button class="active" data-index="0" aria-label="Show message 1"></button>
+          <button data-index="1" aria-label="Show message 2"></button>
+          <button data-index="2" aria-label="Show message 3"></button>
+        </div>
+
+        <div class="brand-stats">
+          <div class="stat"><b>24/7</b><span>Emergency care</span></div>
+          <div class="stat"><b>15+</b><span>Departments</span></div>
+          <div class="stat"><b>112</b><span>Emergency line</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-panel">
+      <div class="form-wrap">
+        <div class="eyebrow">Portal Access</div>
+        <h1>Welcome back</h1>
+        <p class="sub">Sign in with your registered username and password to continue.</p>
+
+        <div class="error-msg" id="errorMsg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="errorText">Please enter both your username and password.</span>
+        </div>
+
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="username">Username</label>
+            <div class="input-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input type="text" id="username" name="username" placeholder="Please enter your username" autocomplete="username" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="password" name="password" placeholder="Enter password" autocomplete="current-password" required />
+              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="row-between">
+            <label class="remember">
+              <input type="checkbox" id="remember" name="remember" />
+              Remember me
+            </label>
+            <a href="#">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-signin">Sign in</button>
+        </form>
+
+        <div class="divider">or</div>
+        <p class="staff-note">
+          New patient? <strong>Register at the front desk</strong> or call<br>
+          <strong>1800-123-4567</strong> to create your portal account.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- =========================================================
+       VIEW 2 — APPOINTMENT BOOKING (hidden until sign-in)
+  ========================================================= -->
+  <div id="apptView" style="display:none;">
+
+    <header class="site-header">
+      <div class="brand-block">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="6" fill="white" fill-opacity="0.15"/>
+          <path d="M16 6v20M6 16h20" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1>JOSEPH</h1>
+          <span class="tagline">Outpatient Appointment Services</span>
+        </div>
+      </div>
+      <button type="button" class="btn-logout" id="logoutBtn">Sign out</button>
+    </header>
+
+    <main class="page-wrap" role="main">
+
+      <div class="welcome-strip" id="welcomeStrip">Signed in</div>
+
+      <div class="page-intro">
+        <h2>Book an appointment</h2>
+        <p>Fill in the form below and our team will confirm your slot within 2 hours on working days.</p>
+      </div>
+
+      <div class="steps" aria-label="Form steps">
+        <div class="step active"><div class="step-num">1</div> Patient info</div>
+      </div>
+
+      <form id="apptForm" novalidate>
+
+        <!-- Patient Details -->
+        <div class="card">
+          <div class="card-title">Patient details</div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="firstName">First name <span class="req">*</span></label>
+              <input type="text" id="firstName" name="firstName" placeholder="*Rahul (example)" maxlength="40" required />
+              <span class="field-error" id="firstNameError">Name should contain letters only, no punctuation.</span>
+            </div>
+            <div class="field">
+              <label for="lastName">Last name <span class="req">*</span></label>
+              <input type="text" id="lastName" name="lastName" placeholder="*Sharma (example)" maxlength="40" required />
+              <span class="field-error" id="lastNameError">Name should contain letters only, no punctuation.</span>
+            </div>
+            <div class="field">
+              <label for="dob">Date of birth <span class="req">*</span></label>
+              <input type="date" id="dob" name="dob" required />
+            </div>
+            <div class="field">
+              <label>Gender <span class="req">*</span></label>
+              <div class="radio-group">
+                <label class="radio-pill" id="gMale">
+                  <input type="radio" name="gender" value="male" />
+                  <span class="radio-dot"></span> Male
+                </label>
+                <label class="radio-pill" id="gFemale">
+                  <input type="radio" name="gender" value="female" />
+                  <span class="radio-dot"></span> Female
+                </label>
+                <label class="radio-pill" id="gOther">
+                  <input type="radio" name="gender" value="other" />
+                  <span class="radio-dot"></span> Other
+                </label>
+              </div>
+            </div>
+            <div class="field">
+              <label for="phone">Phone number <span class="req">*</span></label>
+              <input type="tel" id="phone" name="phone" placeholder="*9876543210 (example)" maxlength="20" required />
+              <span class="field-error" id="phoneError">Please enter a valid 10-digit phone number (numbers only).</span>
+            </div>
+            <div class="field">
+              <label for="email">Email address</label>
+              <input type="email" id="email" name="email" placeholder="*rahul@email.com (example)" />
+              <span class="helper">Confirmation will be sent here</span>
+            </div>
+            <div class="field full">
+              <label for="address">Home address</label>
+              <input type="text" id="address" name="address" placeholder="*House no., street, city (example)" />
+            </div>
+            <div class="field">
+              <label for="bloodGroup">Blood group</label>
+              <select id="bloodGroup" name="bloodGroup">
+                <option value="">Select</option>
+                <option>A+</option><option>A−</option>
+                <option>B+</option><option>B−</option>
+                <option>AB+</option><option>AB−</option>
+                <option>O+</option><option>O−</option>
+                <option>Unknown</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="idType">ID type</label>
+              <select id="idType" name="idType">
+                <option value="">Select</option>
+                <option>Aadhaar card</option>
+                <option>PAN card</option>
+                <option>Passport</option>
+                <option>Voter ID</option>
+                <option>Driving licence</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="idNumber">ID number</label>
+              <input type="text" id="idNumber" name="idNumber" placeholder="*XXXX XXXX XXXX (example)" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointment Details -->
+        <div class="card">
+          <div class="card-title">Appointment details</div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="department">Department <span class="req">*</span></label>
+              <select id="department" name="department" required>
+                <option value="">Select department</option>
+                <option>General Medicine</option>
+                <option>Cardiology</option>
+                <option>Orthopaedics</option>
+                <option>Gynaecology & Obstetrics</option>
+                <option>Paediatrics</option>
+                <option>Dermatology</option>
+                <option>Ophthalmology</option>
+                <option>ENT</option>
+                <option>Neurology</option>
+                <option>Gastroenterology</option>
+                <option>Oncology</option>
+                <option>Psychiatry</option>
+                <option>Urology</option>
+                <option>Dental</option>
+                <option>Physiotherapy</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="doctor">Preferred doctor</label>
+              <select id="doctor" name="doctor">
+                <option value="">No preference</option>
+                <option>Dr. Anjali Mehta</option>
+                <option>Dr. Rakesh Gupta</option>
+                <option>Dr. Priya Nair</option>
+                <option>Dr. Suresh Iyer</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="apptDate">Preferred date <span class="req">*</span></label>
+              <input type="date" id="apptDate" name="apptDate" required />
+            </div>
+            <div class="field">
+              <label for="apptTime">Preferred time <span class="req">*</span></label>
+              <select id="apptTime" name="apptTime" required>
+                <option value="">Select slot</option>
+                <option>08:00 – 09:00</option>
+                <option>09:00 – 10:00</option>
+                <option>10:00 – 11:00</option>
+                <option>11:00 – 12:00</option>
+                <option>14:00 – 15:00</option>
+                <option>15:00 – 16:00</option>
+                <option>16:00 – 17:00</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label>Visit type <span class="req">*</span></label>
+              <div class="urgency-row">
+                <div class="urgency-btn" data-urgency="routine" onclick="selectUrgency(this, 'routine')">🟢 Routine</div>
+                <div class="urgency-btn" data-urgency="urgent" onclick="selectUrgency(this, 'urgent')">🟡 Urgent</div>
+                <div class="urgency-btn" data-urgency="emergency" onclick="selectUrgency(this, 'emergency')">🔴 Emergency</div>
+              </div>
+              <div class="info-box" id="urgencyInfo" style="display:none;"></div>
+            </div>
+            <div class="field full">
+              <label for="symptoms">Reason / symptoms <span class="req">*</span></label>
+              <textarea id="symptoms" name="symptoms" placeholder="Briefly describe your symptoms or reason for visit…" required></textarea>
+            </div>
+            <div class="field">
+              <label>First visit or follow-up?</label>
+              <div class="radio-group">
+                <label class="radio-pill" id="vFirst">
+                  <input type="radio" name="visitType" value="first" />
+                  <span class="radio-dot"></span> First visit
+                </label>
+                <label class="radio-pill" id="vFollowup">
+                  <input type="radio" name="visitType" value="followup" />
+                  <span class="radio-dot"></span> Follow-up
+                </label>
+              </div>
+            </div>
+            <div class="field">
+              <label for="insurance">Insurance / CGHS</label>
+              <select id="insurance" name="insurance">
+                <option value="">Select</option>
+                <option>No insurance (self-pay)</option>
+                <option>CGHS</option>
+                <option>ESIC</option>
+                <option>Star Health</option>
+                <option>HDFC Ergo</option>
+                <option>New India Assurance</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="allergies">Known allergies or current medications</label>
+              <textarea id="allergies" name="allergies" placeholder="List any drug allergies or medicines you are currently taking…" style="min-height: 70px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="card">
+          <div class="card-title">Emergency contact</div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="ecName">Contact name <span class="req">*</span></label>
+              <input type="text" id="ecName" name="ecName" placeholder="*Full name (example)" maxlength="40" required />
+              <span class="field-error" id="ecNameError">Name should contain letters only, no punctuation.</span>
+            </div>
+            <div class="field">
+              <label for="ecRelation">Relation <span class="req">*</span></label>
+              <select id="ecRelation" name="ecRelation" required>
+                <option value="">Select</option>
+                <option>Spouse</option><option>Parent</option><option>Child</option>
+                <option>Sibling</option><option>Friend</option><option>Other</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="ecPhone">Contact number <span class="req">*</span></label>
+              <input type="tel" id="ecPhone" name="ecPhone" placeholder="*9876543210 (example)" maxlength="20" required />
+              <span class="field-error" id="ecPhoneError">Please enter a valid 10-digit phone number (numbers only).</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consent -->
+        <div class="card" style="padding: 1.5rem 2.25rem;">
+          <label class="consent-label">
+            <input type="checkbox" id="consent" name="consent" required />
+            I confirm the information above is accurate and I consent to JOSEPH storing and using it to manage my appointment and treatment, in accordance with the <a href="#">Privacy Policy</a>.
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-back" id="backBtn">← Back</button>
+          <button type="submit" class="btn-submit">Save &amp; continue →</button>
+        </div>
+      </form>
+
+      <p class="footer-note">
+        Questions? Call <strong>1800-123-4567</strong> (toll-free, Mon–Sat 8 am – 8 pm).<br>
+        For emergencies, go directly to our A&amp;E department or dial <strong>112</strong>.
+      </p>
+    </main>
+  </div>
+
+  <script>
+    /* ---------------------------------------------------------
+       Demo credentials (client-side only, for prototype purposes)
+    --------------------------------------------------------- */
+    const VALID_USERS = {
+      'Sameer': 'Sameer@506',
+      'Jasan':  'Jasan@509',
+      'Sabari': 'Sabari@510',
+      'Lenin':  'Lenin@511',
+      'Siril':  'Siril@512'
+    };
+
+    const loginView = document.getElementById('loginView');
+    const apptView  = document.getElementById('apptView');
+    const loginForm = document.getElementById('loginForm');
+    const errorMsg  = document.getElementById('errorMsg');
+    const errorText = document.getElementById('errorText');
+    const togglePass = document.getElementById('togglePass');
+    const passwordInput = document.getElementById('password');
+    const welcomeStrip = document.getElementById('welcomeStrip');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    togglePass.addEventListener('click', () => {
+      const isPass = passwordInput.type === 'password';
+      passwordInput.type = isPass ? 'text' : 'password';
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!username || !password) {
+        errorText.textContent = 'Please enter both your username and password.';
+        errorMsg.style.display = 'flex';
+        return;
+      }
+
+      if (VALID_USERS.hasOwnProperty(username) && VALID_USERS[username] === password) {
+        errorMsg.style.display = 'none';
+        welcomeStrip.innerHTML = 'Signed in as <strong>' + username + '</strong>';
+        loginView.style.display = 'none';
+        apptView.style.display = 'block';
+        window.scrollTo(0, 0);
+      } else {
+        errorText.textContent = 'Incorrect username or password. Please try again.';
+        errorMsg.style.display = 'flex';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      apptView.style.display = 'none';
+      loginView.style.display = 'grid';
+      loginForm.reset();
+      errorMsg.style.display = 'none';
+    });
+
+    const backBtn = document.getElementById('backBtn');
+    backBtn.addEventListener('click', () => {
+      apptView.style.display = 'none';
+      loginView.style.display = 'grid';
+      loginForm.reset();
+      errorMsg.style.display = 'none';
+      window.scrollTo(0, 0);
+    });
+
+    // ---------- Interactive rotating subtitle ----------
+    const subtitleParas = document.querySelectorAll('#subtitleRotator p');
+    const subtitleDots = document.querySelectorAll('#subtitleDots button');
+    let subtitleIndex = 0;
+    let subtitleTimer;
+
+    function showSubtitle(index) {
+      subtitleParas.forEach((p, i) => p.classList.toggle('active', i === index));
+      subtitleDots.forEach((d, i) => d.classList.toggle('active', i === index));
+      subtitleIndex = index;
+    }
+    function nextSubtitle() { showSubtitle((subtitleIndex + 1) % subtitleParas.length); }
+    function startSubtitleRotation() { subtitleTimer = setInterval(nextSubtitle, 4200); }
+    subtitleDots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        clearInterval(subtitleTimer);
+        showSubtitle(parseInt(dot.dataset.index, 10));
+        startSubtitleRotation();
+      });
+    });
+    startSubtitleRotation();
+
+    // ---------- Field validation: names (no punctuation) & phone (digit limit) ----------
+    function attachNameValidation(inputId, errorId) {
+      const input = document.getElementById(inputId);
+      const field = input.closest('.field');
+      input.addEventListener('input', () => {
+        const original = input.value;
+        const cleaned = original.replace(/[^A-Za-z ]/g, '');
+        if (cleaned !== original) {
+          field.classList.add('has-error');
+        } else {
+          field.classList.remove('has-error');
+        }
+        input.value = cleaned;
+      });
+      input.addEventListener('blur', () => field.classList.remove('has-error'));
+    }
+
+    function attachPhoneValidation(inputId, errorId, maxDigits) {
+      const input = document.getElementById(inputId);
+      const field = input.closest('.field');
+
+      function validate() {
+        const original = input.value;
+        const digitsOnly = original.replace(/[^0-9]/g, '');
+        const hadNonDigit = digitsOnly !== original;
+        const overLimit = digitsOnly.length > maxDigits;
+        const exceeded = hadNonDigit || overLimit;
+
+        const truncated = digitsOnly.slice(0, maxDigits);
+        if (truncated !== input.value) {
+          input.value = truncated;
+        }
+        field.classList.toggle('has-error', exceeded);
+      }
+
+      input.addEventListener('input', validate);
+      input.addEventListener('blur', () => {
+        if (input.value.length > 0 && input.value.length < maxDigits) {
+          field.classList.add('has-error');
+        }
+      });
+    }
+
+    attachNameValidation('firstName', 'firstNameError');
+    attachNameValidation('lastName', 'lastNameError');
+    attachNameValidation('ecName', 'ecNameError');
+    attachPhoneValidation('phone', 'phoneError', 10);
+    attachPhoneValidation('ecPhone', 'ecPhoneError', 10);
+
+    // ---------- Appointment form behaviour ----------
+    const urgencyMessages = {
+      routine: "Standard appointments are available within 3–5 working days.",
+      urgent: "Urgent slots are within 24–48 hours. Our triage team will call you to confirm.",
+      emergency: "If this is a life-threatening emergency, please call 112 or come directly to A&E."
+    };
+
+    function selectUrgency(el, type) {
+      document.querySelectorAll('.urgency-btn').forEach(b => b.className = 'urgency-btn');
+      el.classList.add('selected-' + type);
+      const box = document.getElementById('urgencyInfo');
+      box.textContent = urgencyMessages[type];
+      box.style.display = 'block';
+    }
+
+    document.querySelectorAll('.radio-pill input').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll(`input[name="${radio.name}"]`).forEach(r => {
+          r.closest('.radio-pill').classList.remove('checked');
+        });
+        radio.closest('.radio-pill').classList.add('checked');
+      });
+    });
+
+    const today = new Date().toISOString().split('T')[0];
+    const apptDateInput = document.getElementById('apptDate');
+    if (apptDateInput) apptDateInput.setAttribute('min', today);
+
+    const apptForm = document.getElementById('apptForm');
+    apptForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const required = this.querySelectorAll('[required]');
+      let valid = true;
+      required.forEach(el => {
+        if (!el.value.trim() || (el.type === 'checkbox' && !el.checked)) {
+          el.style.borderColor = '#A32D2D';
+          valid = false;
+        } else {
+          el.style.borderColor = '';
+        }
+      });
+      if (this.querySelectorAll('.field.has-error').length > 0) {
+        valid = false;
+      }
+      ['phone', 'ecPhone'].forEach(id => {
+        const phoneInput = document.getElementById(id);
+        if (phoneInput.value && phoneInput.value.length !== 10) {
+          phoneInput.closest('.field').classList.add('has-error');
+          valid = false;
+        }
+      });
+      if (valid) {
+        alert('Thank you! Your appointment request has been received. We will confirm your slot shortly.');
+      } else {
+        alert('Please fill in all required fields correctly.');
+      }
+    });
+  </script>
+
+</body>
+</html>
